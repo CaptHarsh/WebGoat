@@ -12,7 +12,7 @@ trigger:
     include:
       - main
 
-# Optional scheduled scan (recommended)
+# Optional scheduled scan
 schedules:
 - cron: "0 2 * * *"   # 02:00 UTC
   displayName: "Nightly Checkmarx SAST Scan"
@@ -21,7 +21,7 @@ schedules:
       - main
   always: true
 
-# Use self-hosted agent (MANDATORY for internal Checkmarx)
+# Use self-hosted agent
 pool:
   name: Harsh
   agent: HarshAgent
@@ -45,6 +45,10 @@ steps:
     )
   inputs:
     projectName: 'HarshTest'
+
+    # ---- REQUIRED TEAM ----
+    fullTeamName: '/CxServer'
+
     enableProxy: false
 
     # -------- SAST ONLY --------
