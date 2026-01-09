@@ -1,35 +1,38 @@
-# ===============================
-# Checkmarx Controlled SAST Scan
-# ===============================
+# =========================================
+# Controlled Checkmarx SAST Pipeline
+# Self-hosted agent: HarshAgent
+# =========================================
 
-# Disable all PR-based execution
+# Disable PR-triggered pipelines completely
 pr: none
 
-# Run pipeline only when main is updated
+# Trigger only on merge to main
 trigger:
   branches:
     include:
       - main
 
-# Optional: scheduled scan (recommended)
+# Optional scheduled scan (recommended)
 schedules:
 - cron: "0 2 * * *"   # 02:00 UTC
-  displayName: "Nightly Checkmarx SAST"
+  displayName: "Nightly Checkmarx SAST Scan"
   branches:
     include:
       - main
   always: true
 
+# Use self-hosted agent (MANDATORY for internal Checkmarx)
 pool:
-  vmImage: ubuntu-latest
+  name: Harsh
+  agent: HarshAgent
 
 steps:
-- script: echo "Pipeline started"
+- script: echo "Pipeline started on self-hosted agent"
   displayName: 'Pipeline init'
 
-# -------------------------------
-# Checkmarx SAST (STRICTLY gated)
-# -------------------------------
+# -----------------------------------------
+# Checkmarx SAST (SAST-only, gated execution)
+# -----------------------------------------
 - task: Application security testing@2025
   displayName: 'Checkmarx SAST Scan'
   condition: |
@@ -44,7 +47,7 @@ steps:
     projectName: 'HarshTest'
     enableProxy: false
 
-    # ---- SAST ONLY ----
+    # -------- SAST ONLY --------
     enableSastScan: true
     enableDependencyScan: false
 
