@@ -21,7 +21,7 @@ schedules:
       - main
   always: true
 
-# Use self-hosted agent
+# Use self-hosted agent pool
 pool:
   name: Harsh
   agent: HarshAgent
@@ -46,8 +46,8 @@ steps:
   inputs:
     projectName: 'HarshTest'
 
-    # ---- REQUIRED TEAM ----
-    fullTeamName: '/CxServer'
+    # ---- REQUIRED TEAM (correct format) ----
+    fullTeamName: 'CxServer'
 
     enableProxy: false
 
