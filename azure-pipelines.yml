@@ -1,32 +1,57 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# ===============================
+# Checkmarx Controlled SAST Scan
+# ===============================
 
+# Disable all PR-based execution
+pr: none
+
+# Run pipeline only when main is updated
 trigger:
-- main
+  branches:
+    include:
+      - main
+
+# Optional: scheduled scan (recommended)
+schedules:
+- cron: "0 2 * * *"   # 02:00 UTC
+  displayName: "Nightly Checkmarx SAST"
+  branches:
+    include:
+      - main
+  always: true
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- script: echo "Pipeline started"
+  displayName: 'Pipeline init'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
-
+# -------------------------------
+# Checkmarx SAST (STRICTLY gated)
+# -------------------------------
 - task: Application security testing@2025
+  displayName: 'Checkmarx SAST Scan'
+  condition: |
+    and(
+      succeeded(),
+      or(
+        eq(variables['Build.SourceBranch'], 'refs/heads/main'),
+        eq(variables['Build.Reason'], 'Schedule')
+      )
+    )
   inputs:
     projectName: 'HarshTest'
     enableProxy: false
+
+    # ---- SAST ONLY ----
     enableSastScan: true
+    enableDependencyScan: false
+
     CheckmarxService: 'CXSAST'
     enableSastBranching: false
     engineConfigId: '5'
+
     fullScansScheduled: false
     generatePDFReport: true
     avoidDuplicateScans: true
-    enableDependencyScan: false
